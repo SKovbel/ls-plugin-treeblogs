@@ -4,7 +4,7 @@
  * Запрещаем напрямую через браузер обращение к этому файлу.
  */
 if (!class_exists('Plugin')) {
-    die('Hacking attemp!');
+    die('Hacking attemp!!');
 }
 
 class PluginTreeblogs extends Plugin
@@ -17,10 +17,12 @@ class PluginTreeblogs extends Plugin
             'ModuleTopic' => '_ModuleTopic',
         ),
         'entity' => array(
-            'ModuleBlog_EntityBlog' => '_ModuleBlog_EntityBlog',
+            'ModuleBlog_EntityBlog' 	=> '_ModuleBlog_EntityBlog',
+            'ModuleTopic_EntityTopic' 	=> '_ModuleTopic_EntityTopic',
         ),
         'mapper' => array(
-            'ModuleBlog_MapperBlog' => '_ModuleBlog_MapperBlog',
+            'ModuleBlog_MapperBlog' 	=> '_ModuleBlog_MapperBlog',
+            'ModuleTopic_MapperTopic' 	=> '_ModuleTopic_MapperTopic',
         ),
     );
     /**

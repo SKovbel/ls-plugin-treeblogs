@@ -2,7 +2,7 @@
 
 class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 {
-
+	
     /**
      * Список топиков по модифицированному фильтру
      *
@@ -91,5 +91,79 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
         }
         return $blogIds;
     }
+    
+    /**
+     * Мержим деревья - удаления дублирующихся 
+     * @param int $blogId
+     * @return array
+     */
+    private function mergeTree($to, $from){
+    	$i=count($from)-1;
+    	foreach($from as $node) {
+    		if ( !isset($to[$node]) ){
+    			$to[$node]=$i;
+    		} else {
+				if ($to[$node]==0 and $i > 0 ){
+    				$to[$node]=$i;
+				}
+    		}
+    		$i--;
+    	}
+    	return $to;
+    }
+
+    /**
+     * Мержим блоги для топика
+     * @param int $blogId
+     * @return array
+     */
+    public function MergeTopicBlogs($topic_id, $defblog_id)
+    {
+    	
+		$blogs_post = getRequest('subblog_id');
+		$blogs_db   = $this->oMapperTopic->GetTopicSubBlogs($topic_id);
+		
+		$aResTree = array();
+		$aTreeDefBlog = $this->Blog_BuildTreeBlogsFromTail($defblog_id);
+		foreach ($aTreeDefBlog as $blog_id)
+		{
+			 $aResTree[$blog_id] = 1;	
+		}
+		
+		foreach ($blogs_post as $blog_id)
+		{
+			$aTreeBlog = $this->Blog_BuildTreeBlogsFromTail($blog_id);
+			$aResTree = $this->mergeTree($aResTree, $aTreeBlog);
+		}
+		$aResPosTree = array();		
+		foreach ($aResTree as $blog_id => $cnt) {
+			if ($cnt == 0)	
+				array_push($aResPosTree, $blog_id);
+		}
+
+		foreach ($blogs_db as $blog)
+        {
+			if (!in_array($blog, $aResPosTree))
+			{
+				$this->oMapperTopic->DeleteTopicFromSubBlog($blog['blog_id'], $topic_id);
+			}
+		}        
+        
+		foreach ($aResPosTree as $blog_id)
+		{
+			if (!in_array($blog_id, $blogs_db)  && $blog_id != -1)
+			{
+				$this->oMapperTopic->AddTopicToSubBlog($blog_id, $topic_id);
+			}
+		}       
+    }
+
+    public function GetTopicSubBlogs($topic_id)
+    {
+		return $this->oMapperTopic->GetTopicSubBlogs($topic_id);
+    }
+    
+
+    
 
 }

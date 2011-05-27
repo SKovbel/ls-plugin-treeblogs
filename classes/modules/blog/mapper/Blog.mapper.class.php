@@ -11,6 +11,26 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
      * 
      * @param ModuleBlog_EntityBlog $oBlog
      * @return boolean
+     */	public function getParentBlogId($blog_id)
+	{
+        $sql = "
+        	SELECT
+				b.parent_id
+			FROM
+				" . Config::Get('db.table.blog') . " as b
+			WHERE
+				b.blog_id = ?
+            ";
+        $aRows = $this->oDb->select($sql, $blog_id );
+        if (isset($aRows[0]))
+        	return $aRows[0]['parent_id'];
+        return null;
+	}
+    /**
+     * Обновление связи блог-блог
+     * 
+     * @param ModuleBlog_EntityBlog $oBlog
+     * @return boolean
      */
     public function UpdateParentId($oBlog)
     {
