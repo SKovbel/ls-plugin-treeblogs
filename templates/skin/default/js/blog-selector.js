@@ -1,5 +1,5 @@
 var nxtGroup=0;
-var treepluginsurl='/plugins/treeblogs/include/ajax/treeblogs.php';
+var treepluginsurl='/plugins/ls-plugin-treeblogs/include/ajax/treeblogs.php';
 
 function delGroup(groupidx){
 	var group 	= 'g'+groupidx;
