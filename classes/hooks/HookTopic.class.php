@@ -35,9 +35,9 @@ class PluginTreeblogs_HookTopic extends Hook
 	{
 		$topicId = $_REQUEST['topic_id'];
 		if (isset($topicId)){ /*редактирование топика*/
-			$oTopic 	= $this->Topic_GetTopicsAdditionalData($topicId);
-			$oTopic 	= $oTopic[$topicId];
-			$subblogs   = $this->Topic_GetTopicSubBlogs($oTopic->getId());
+			$oTopic		= $this->Topic_GetTopicsAdditionalData($topicId);
+			$oTopic		= $oTopic[$topicId];
+			$subblogs	= $this->Topic_GetTopicSubBlogs($oTopic->getId());
 			array_unshift($subblogs, $oTopic->getBlogId());
 				
 			$groups = array();
@@ -50,12 +50,12 @@ class PluginTreeblogs_HookTopic extends Hook
 				$j=0;
 				foreach ($aBlogsId as $blogid){
 					$blogs 			= $this->Blog_GetBlogsTreeLevel($blogid);
-					$allBlogs[$j] 		= $this->Blog_GetBlogsAdditionalData($blogs);
+					$allBlogs[$j] 	= $this->Blog_GetBlogsAdditionalData($blogs);
 					$j++;
 				}
-				$tailBlogs 				= $this->Blog_GetSubBlogs($aBlogsId[$j-1]); /*конечный єлемент*/
+				$tailBlogs = $this->Blog_GetSubBlogs($aBlogsId[$j-1]); /*конечный єлемент*/
 				if (count($tailBlogs) > 0) {
-					$allBlogs[$j]        	= $this->Blog_GetBlogsAdditionalData($tailBlogs);
+					$allBlogs[$j] = $this->Blog_GetBlogsAdditionalData($tailBlogs);
 					$j++;
 				}
 
