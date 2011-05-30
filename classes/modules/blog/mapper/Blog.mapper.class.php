@@ -21,7 +21,7 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 			" . Config::Get('db.table.blog') . " as b
 		WHERE
 			b.blog_id = ?
-            ";
+		";
 		$aRows = $this->oDb->select($sql, $blog_id );
 		if (isset($aRows[0])) {
 			return $aRows[0]['parent_id'];
@@ -38,9 +38,12 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 	public function UpdateParentId($oBlog)
 	{
 		$sql = "
-		UPDATE " . Config::Get('db.table.blog') . "
-		   SET parent_id = ?
-		 WHERE blog_id = ?d
+		UPDATE 
+			" . Config::Get('db.table.blog') . "
+		SET 
+			parent_id = ?
+		WHERE 
+			blog_id = ?d
 		";
 		$this->oDb->query($sql, $oBlog->getParentId(), $oBlog->getId());
 		return true;
@@ -62,7 +65,7 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 			b.parent_id = ?
 		ORDER BY b.blog_rating DESC
 		LIMIT ?d
-                ";
+		";
 		$aBlogs = array();
 		if ($aRows = $this->oDb->select($sql, $BlogId, Config::Get('plugin.treeblogs.blogs.count'))) {
 			foreach ($aRows as $aBlog) {
@@ -87,7 +90,7 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 		WHERE
 			b.blog_type<>'personal'
 			AND b.parent_id IS NULL
-				";
+		";
 		$aBlogs = array();
 		if ($aRows = $this->oDb->select($sql)) {
 			foreach ($aRows as $aBlog) {
@@ -111,7 +114,8 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 		FROM
 			" . Config::Get('db.table.blog') . " as b
 		WHERE
-			b.blog_type<>'personal'";
+			b.blog_type<>'personal'
+		";
 		if (!is_null($blogId)) {
 			$sql .= 'AND b.blog_id <> ' . $blogId;
 		}
@@ -131,7 +135,8 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 		FROM
 			" . Config::Get('db.table.blog') . " as b
 		WHERE
-			b.blog_type<>'personal'";
+			b.blog_type<>'personal'
+		";
 		$aBlogs = array();
 		if ($aRows = $this->oDb->select($sql)) {
 			foreach ($aRows as $aRow) {

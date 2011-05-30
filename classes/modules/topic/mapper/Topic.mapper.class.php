@@ -20,8 +20,8 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 			" . Config::Get('db.table.topic_blog') . " a
 		WHERE
 			a.topic_id = ?
-		ORDER BY a.blog_id ASC 
-				";
+		ORDER BY a.blog_id ASC
+		";
 		 
 		$aBlogs = array();
 		if ($aRows = $this->oDb->select($sql, $TopicId)) {
@@ -43,10 +43,12 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 	public function DeleteTopicFromSubBlog($BlogId, $TopicId)
 	{
 		$sql = "
-        	DELETE 
-        	  FROM " . Config::Get('db.table.topic_blog') . "
-			WHERE blog_id = ?d AND topic_id = ?d
-			";
+		DELETE
+		FROM 
+			" . Config::Get('db.table.topic_blog') . "
+		WHERE 
+			blog_id = ?d AND topic_id = ?d
+		";
 		$this->oDb->query($sql, $BlogId, $TopicId);
 		return true;
 	}
@@ -62,11 +64,11 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 	public function AddTopicToSubBlog($BlogId, $TopicId)
 	{
 		$sql = "
-        	INSERT
-        	  INTO " . Config::Get('db.table.topic_blog') . "
+		INSERT
+		INTO " . Config::Get('db.table.topic_blog') . "
 			(`blog_id`, `topic_id`)
 			VALUES (?d, ?d)
-			";
+		";
 		$this->oDb->query($sql, $BlogId, $TopicId);
 		return true;
 	}
