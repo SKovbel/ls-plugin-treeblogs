@@ -113,7 +113,7 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 	}
 
 	/**
-	 * Мержим блоги для топика
+	 * Мержим  блоги (Добавление-удаление) для топика
 	 * - Исключаем повторные вхождения блогов для топика
 	 * 
 	 * @param int $blogId
