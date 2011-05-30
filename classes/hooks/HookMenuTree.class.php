@@ -44,10 +44,10 @@ class PluginTreeblogs_HookMenuTree extends Hook
 		$this->Viewer_Assign('aFullTree',  $fulltree );
 			
 		$this->Viewer_Assign('side_bar_level', Plugin::GetTemplatePath('treeblogs') .'actions/ActionMenuTree/side_bar_level.tpl');
-		$this->Viewer_AddBlock('right', 
-								Plugin::GetTemplatePath('treeblogs') .'actions/ActionMenuTree/side_bar.tpl',
-								array(),
-								Config::Get('plugin.treeblogs.treemenu_block_priority')
+		$this->Viewer_AddBlock('right',
+			Plugin::GetTemplatePath('treeblogs') .'actions/ActionMenuTree/side_bar.tpl',
+			array(),
+			Config::Get('plugin.treeblogs.treemenu_block_priority')
 		);
 
 	}
