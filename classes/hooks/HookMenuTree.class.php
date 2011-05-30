@@ -19,7 +19,7 @@ class PluginTreeblogs_HookMenuTree extends Hook
 	}
 
 	/**
-	 * Выводим блок - "дерево блогов"
+	 * Выводим блок - "дерево категорий" 
 	 * @param array $aData
 	 */
 	public function TreeMenuShow($aData)
@@ -53,7 +53,7 @@ class PluginTreeblogs_HookMenuTree extends Hook
 	}
 
 	/**
-	 * 1. Показываем блок "дерево блогов" только для index.php страници
+	 * 1. Показываем блок "дерево категорий" для index страници
 	 * 2. Подключаем front.css и blog-menu.js
 	 * @param array $aVars
 	 **/
