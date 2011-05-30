@@ -6,7 +6,7 @@
 	<div id="g{$idxi}" class="group">
 		<input type="hidden" name="{if $idxi == 0}blog_id{else}subblog_id[{$idxi}]{/if}" id="{if $idxi == 0}blog_id{else}subblog_id_{$idxi}{/if}" value="{$group.blog_id}"></input>
 		{if $idxi > 0}
-		<a href="thisAncor{$idxi}"></a><a href="#thisAncor{$idxi}" onclick="delGroup({$idxi})">Delete group</a>
+		<a href="thisAncor{$idxi}"></a><a href="#thisAncor{$idxi}" onclick="delGroup({$idxi})">{$aLang.del_group}</a>
 		{/if}
 		
 		{assign var="idxj" value=0}

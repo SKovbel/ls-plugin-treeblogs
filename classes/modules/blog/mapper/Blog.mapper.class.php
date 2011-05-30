@@ -10,7 +10,7 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 	 * Возвращаем родительский блог
 	 *
 	 * @param ModuleBlog_EntityBlog $oBlog
-	 * @return BlogId|int
+	 * @return int BlogId
 	 */	
 	public function getParentBlogId($blog_id)
 	{

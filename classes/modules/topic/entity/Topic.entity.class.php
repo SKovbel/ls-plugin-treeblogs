@@ -9,7 +9,7 @@ class PluginTreeblogs_ModuleTopic_EntityTopic extends PluginTreeblogs_Inherit_Mo
 	
 	/**
 	 * Строим множество всех блогов, которым прямо или косвенно принадлежит топик
-	 * @return aBlogId|int
+	 * @return array aBlogId
 	 * */
 	public function GetBlogs(){
 		if (!isset($this->aBlogs)){

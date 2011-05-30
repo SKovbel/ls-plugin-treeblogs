@@ -88,8 +88,8 @@ class PluginTreeblogs_HookBlog extends Hook
 
 	/**
 	 *  Формируем пагинацию
-	 * @param ModuleBlog_EntityBlog $oBlog
-	 * @param string $sShowType
+	 * @param oBlog
+	 * @param string sShowType
 	 */
 	protected function makePaging($oBlog, $sShowType)
 	{

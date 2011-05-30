@@ -8,8 +8,8 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 	/**
 	 * Возвращаем блоги для топика
 	 *
-	 * @param  TopicId|int
-	 * @return aBlogId|int
+	 * @param  int TopicId
+	 * @return array aBlogId
 	 */	
 	public function GetTopicSubBlogs($TopicId)
 	{
@@ -36,7 +36,8 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 	/**
 	 * Удаляем связку топик-блог
 	 *
-	 * @param  TopicId|int BlogId|int
+	 * @param  int TopicId
+	 * @param  int BlogId
 	 * @return boolean
 	 */	
 	public function DeleteTopicFromSubBlog($BlogId, $TopicId)
@@ -54,7 +55,8 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 	/**
 	 * Добавляем связку топик-блог
 	 *
-	 * @param  TopicId|int BlogId|int
+	 * @param int TopicId
+	 * @param int BlogId
 	 * @return boolean
 	 */	
 	public function AddTopicToSubBlog($BlogId, $TopicId)
@@ -138,7 +140,10 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 	 * ovveride Topic.GetTopics
 	 * Новый запрос для выборки топика/ов 
 	 *
-	 * @param  $aFilter,&$iCount,$iCurrPage,$iPerPage
+	 * @param aFilter
+	 * @param iCount
+	 * @param iCurrPage
+	 * @param iPerPage
 	 * @return aTopic
 	 */	
 	public function GetTopics($aFilter,&$iCount,$iCurrPage,$iPerPage) {

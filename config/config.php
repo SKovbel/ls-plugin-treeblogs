@@ -3,7 +3,7 @@ $config = array();
 $config['blogs']['count'] = 5;
 
 /**
- * Приоритет блока "дерево блогов"
+ * Приоритет блока "дерево каталогов"
  */
 $config['treemenu_block_priority'] = 175;
 

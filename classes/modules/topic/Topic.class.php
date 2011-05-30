@@ -78,22 +78,22 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 	/**
 	 * Получаем под блоги
 	 *
-	 * @param int $blogId
+	 * @param int $BlogId
 	 * @return array
 	 */
-	protected function _getSubBlogs($blogId)
+	protected function _getSubBlogs($BlogId)
 	{
 		$blogIds = array();
-		$blogIds = $this->Blog_GetSubBlogs($blogId);
-		foreach ($blogIds as $blogId) {
-			$subBlogIds = $this->_getSubBlogs($blogId);
+		$blogIds = $this->Blog_GetSubBlogs($BlogId);
+		foreach ($blogIds as $BlogId) {
+			$subBlogIds = $this->_getSubBlogs($BlogId);
 			$blogIds = array_merge($blogIds, $subBlogIds);
 		}
 		return $blogIds;
 	}
 
 	/**
-	 * Мержим деревья - удаления дублирующихся
+	 * Мержим два деревья - удаления дублирующихся промежуточные блоги
 	 * @param int $blogId
 	 * @return array
 	 */
@@ -116,17 +116,18 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 	 * Мержим  блоги (Добавление-удаление) для топика
 	 * - Исключаем повторные вхождения блогов для топика
 	 * 
-	 * @param int $blogId
+	 * @param int $TopicId
+	 * @param int $BlogId
 	 * @return array
 	 */
-	public function MergeTopicBlogs($topic_id, $defblog_id)
+	public function MergeTopicBlogs($TopicId, $BlogId)
 	{
 		 
 		$blogs_post = getRequest('subblog_id');
-		$blogs_db   = $this->oMapperTopic->GetTopicSubBlogs($topic_id);
+		$blogs_db   = $this->oMapperTopic->GetTopicSubBlogs($TopicId);
 
 		$aResTree = array();
-		$aTreeDefBlog = $this->Blog_BuildTreeBlogsFromTail($defblog_id);
+		$aTreeDefBlog = $this->Blog_BuildTreeBlogsFromTail($BlogId);
 		foreach ($aTreeDefBlog as $blog_id)
 		{
 			$aResTree[$blog_id] = 1;
@@ -134,8 +135,10 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 
 		foreach ($blogs_post as $blog_id)
 		{
-			$aTreeBlog = $this->Blog_BuildTreeBlogsFromTail($blog_id);
-			$aResTree = $this->mergeTree($aResTree, $aTreeBlog);
+			if ($blog_id > 0) {
+				$aTreeBlog = $this->Blog_BuildTreeBlogsFromTail($blog_id);
+				$aResTree = $this->mergeTree($aResTree, $aTreeBlog);
+			}
 		}
 		$aResPosTree = array();
 		foreach ($aResTree as $blog_id => $cnt) {
@@ -148,23 +151,29 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 		{
 			if (!in_array($blog, $aResPosTree))
 			{
-				$this->oMapperTopic->DeleteTopicFromSubBlog($blog['blog_id'], $topic_id);
+				$this->oMapperTopic->DeleteTopicFromSubBlog($blog['blog_id'], $TopicId);
 			}
 		}
 
 		foreach ($aResPosTree as $blog_id)
 		{
-			if (!in_array($blog_id, $blogs_db)  && $blog_id != -1)
+			if ( !in_array($blog_id, $blogs_db) )
 			{
-				$this->oMapperTopic->AddTopicToSubBlog($blog_id, $topic_id);
+				$this->oMapperTopic->AddTopicToSubBlog($blog_id, $TopicId);
 			}
 		}
 	}
 
 	
-	public function GetTopicSubBlogs($topic_id)
+	/**
+	 * Возвращаем блоги  топика
+	 * 
+	 * @param int $TopicId
+	 * @return array
+	 */
+	public function GetTopicSubBlogs($TopicId)
 	{
-		return $this->oMapperTopic->GetTopicSubBlogs($topic_id);
+		return $this->oMapperTopic->GetTopicSubBlogs($TopicId);
 	}
 
 

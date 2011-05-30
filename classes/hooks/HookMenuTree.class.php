@@ -53,7 +53,7 @@ class PluginTreeblogs_HookMenuTree extends Hook
 	}
 
 	/**
-	 * 1. Показываем блок "дерево категорий" для index страници
+	 * 1. Показываем блок "дерево категорий" для index страницы
 	 * 2. Подключаем front.css и blog-menu.js
 	 * @param array $aVars
 	 **/

@@ -29,8 +29,9 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 
 	/**
 	 * Строим ветку дерева для конкретного блога
-	 * @param BlogId|int
-	 * @return aBlogId|int
+	 * 
+	 * @param int BlogId
+	 * @return array aBlogId
 	 * */
 	public function BuildTreeBlogsFromTail($BlogId)
 	{
@@ -54,7 +55,7 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 	/**
 	 * Строим поддерево из всех доступных веток для конктретного топика
 	 * @param oTopic
-	 * @return aBlogId|int
+	 * @return int aBlogId
 	 * */
 	public function GetTopicFullTree($oTopic){
 		$aBlogsTopic = $this->Blog_BuildTreeBlogsFromTail($oTopic->getBlogId());
@@ -73,8 +74,9 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 	/**
 	 * Строим полное дерево из всех доступных блогов (древовидное меню) 
 	 * Функция рекурсивна
-	 * @param ParentId|int
-	 * @return BlogId|int
+	 * 
+	 * @param int ParentId
+	 * @return int BlogId
 	 * */
 	public function buidlFullTree($ParentId){
 		if (!$ParentId){
@@ -179,9 +181,9 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 	/**
 	 * Получаем подблоги
 	 *
-	 * @param int $blogId
-	 * @param array $aBlogs
-	 * @param int $level
+	 * @param int blogId
+	 * @param array aBlogs
+	 * @param int level
 	 * @return array
 	 */
 	protected function _getSubBlogs($blogId, $aBlogs, $level)
