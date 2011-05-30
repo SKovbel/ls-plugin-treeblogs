@@ -49,8 +49,8 @@ class PluginTreeblogs_HookTopic extends Hook
 				$selected = array();
 				$j=0;
 				foreach ($aBlogsId as $blogid){
-					$blogs 			= $this->Blog_GetBlogsTreeLevel($blogid);
-					$allBlogs[$j] 	= $this->Blog_GetBlogsAdditionalData($blogs);
+					$blogs			= $this->Blog_GetBlogsTreeLevel($blogid);
+					$allBlogs[$j]	= $this->Blog_GetBlogsAdditionalData($blogs);
 					$j++;
 				}
 				$tailBlogs = $this->Blog_GetSubBlogs($aBlogsId[$j-1]); /*конечный єлемент*/
@@ -59,9 +59,9 @@ class PluginTreeblogs_HookTopic extends Hook
 					$j++;
 				}
 
-				$groups[$i]['blog_id'] 			= $blog_id;
-				$groups[$i]['Blogs'] 			= $allBlogs;
-				$groups[$i]['ActiveBlogId'] 	= $aBlogsId;
+				$groups[$i]['blog_id']			= $blog_id;
+				$groups[$i]['Blogs']			= $allBlogs;
+				$groups[$i]['ActiveBlogId']		= $aBlogsId;
 				$i++;
 			}
 			$this->Viewer_Assign('groups', $groups);
