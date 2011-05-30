@@ -5,10 +5,15 @@
  */
 class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_ModuleTopic_MapperTopic
 {
-	
-	public function GetTopicSubBlogs($topicid) 
-    {
-        $sql = "
+	/**
+	 * Возвращаем блоги для топика
+	 *
+	 * @param  TopicId|int
+	 * @return aBlogId|int
+	 */	
+	public function GetTopicSubBlogs($TopicId)
+	{
+		$sql = "
         	SELECT
 				a.blog_id
 			FROM
@@ -17,49 +22,67 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 					a.topic_id = ?
             ORDER BY a.blog_id ASC 
 				";
-         
-        $aBlogs = array();
-        if ($aRows = $this->oDb->select($sql, $topicid)) {
-            foreach ($aRows as $aBlog) {
-                $aBlogs[] = $aBlog['blog_id'];
-            }
-        }
-        return $aBlogs;
-        
-    }
-	
-    public function DeleteTopicFromSubBlog($blog_id, $topic_id) 
-    {
-        $sql = "
+		 
+		$aBlogs = array();
+		if ($aRows = $this->oDb->select($sql, $TopicId)) {
+			foreach ($aRows as $aBlog) {
+				$aBlogs[] = $aBlog['blog_id'];
+			}
+		}
+		return $aBlogs;
+
+	}
+
+	/**
+	 * Удаляем связку топик-блог
+	 *
+	 * @param  TopicId|int BlogId|int
+	 * @return boolean
+	 */	
+	public function DeleteTopicFromSubBlog($BlogId, $TopicId)
+	{
+		$sql = "
         	DELETE 
         	  FROM " . Config::Get('db.table.topic_blog') . "
 			WHERE blog_id = ?d AND topic_id = ?d
 			";
-        $this->oDb->query($sql, $blog_id, $topic_id);
-        return true;
-    }
-    
-	
-    public function AddTopicToSubBlog($blog_id, $topic_id) 
-    {
-        $sql = "
+		$this->oDb->query($sql, $BlogId, $TopicId);
+		return true;
+	}
+
+
+	/**
+	 * Добавляем связку топик-блог
+	 *
+	 * @param  TopicId|int BlogId|int
+	 * @return boolean
+	 */	
+	public function AddTopicToSubBlog($BlogId, $TopicId)
+	{
+		$sql = "
         	INSERT
         	  INTO " . Config::Get('db.table.topic_blog') . "
 			(`blog_id`, `topic_id`)
 			VALUES (?d, ?d)
 			";
-        $this->oDb->query($sql, $blog_id, $topic_id);
-        return true;
-    }
-    
-    
-    
+		$this->oDb->query($sql, $BlogId, $TopicId);
+		return true;
+	}
+
+
+
+	/**
+	 * Доп условие для выборки блога по топику 
+	 *
+	 * @param  aFilter
+	 * @return Where | string
+	 */	
 	protected function buildFilter2($aFilter) {
- 		
+			
 		$sWhere='';
 		if (isset($aFilter['topic_publish'])) {
 			$sWhere.=" AND t.topic_publish =  ".(int)$aFilter['topic_publish'];
-		}	
+		}
 		if (isset($aFilter['topic_rating']) and is_array($aFilter['topic_rating'])) {
 			$sPublishIndex='';
 			if (isset($aFilter['topic_rating']['publish_index']) and $aFilter['topic_rating']['publish_index']==1) {
@@ -69,15 +92,15 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 				$sWhere.=" AND ( t.topic_rating >= ".(float)$aFilter['topic_rating']['value']." {$sPublishIndex} ) ";
 			} else {
 				$sWhere.=" AND ( t.topic_rating < ".(float)$aFilter['topic_rating']['value']."  ) ";
-			}			
+			}
 		}
 		if (isset($aFilter['topic_new'])) {
 			$sWhere.=" AND t.topic_date_add >=  '".$aFilter['topic_new']."'";
 		}
 		if (isset($aFilter['user_id'])) {
 			$sWhere.=is_array($aFilter['user_id'])
-				? " AND t.user_id IN(".implode(', ',$aFilter['user_id']).")"
-				: " AND t.user_id =  ".(int)$aFilter['user_id'];
+			? " AND t.user_id IN(".implode(', ',$aFilter['user_id']).")"
+			: " AND t.user_id =  ".(int)$aFilter['user_id'];
 		}
 		if (isset($aFilter['blog_id'])) {
 			if(!is_array($aFilter['blog_id'])) {
@@ -101,20 +124,27 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 					$sType=$aBlogId;
 					$aBlogId=array();
 				}
-				
-				$aBlogTypes[] = (count($aBlogId)==0) 
-					? "(b.blog_type='".$sType."')"
-					: "(b.blog_type='".$sType."' AND t.blog_id IN ('".join("','",$aBlogId)."'))";
+
+				$aBlogTypes[] = (count($aBlogId)==0)
+				? "(b.blog_type='".$sType."')"
+				: "(b.blog_type='".$sType."' AND t.blog_id IN ('".join("','",$aBlogId)."'))";
 			}
 			$sWhere.=" AND (".join(" OR ",(array)$aBlogTypes).")";
 		}
 		return $sWhere;
 	}
-	
+
+	/**
+	 * ovveride Topic.GetTopics
+	 * Новый запрос для выборки топика/ов 
+	 *
+	 * @param  $aFilter,&$iCount,$iCurrPage,$iPerPage
+	 * @return aTopic
+	 */	
 	public function GetTopics($aFilter,&$iCount,$iCurrPage,$iPerPage) {
 		$sWhere=$this->buildFilter($aFilter);
 		$sWhere2=$this->buildFilter2($aFilter);
-		
+
 		if(isset($aFilter['order']) and !is_array($aFilter['order'])) {
 			$aFilter['order'] = array($aFilter['order']);
 		} else {
@@ -145,15 +175,14 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 						and t.topic_id=tb.topic_id				
 					ORDER BY ".implode(', ', $aFilter['order']) ."
 					LIMIT ?d, ?d";		
-				//echo $sql;
-				$aTopics=array();
-		if ($aRows=$this->oDb->selectPage($iCount,$sql,($iCurrPage-1)*$iPerPage, $iPerPage)) {			
+		$aTopics=array();
+		if ($aRows=$this->oDb->selectPage($iCount,$sql,($iCurrPage-1)*$iPerPage, $iPerPage)) {
 			foreach ($aRows as $aTopic) {
 				$aTopics[]=$aTopic['topic_id'];
 			}
-		}				
+		}
 		return $aTopics;
 	}
-    
-    
+
+
 }

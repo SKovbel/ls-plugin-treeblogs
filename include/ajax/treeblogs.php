@@ -8,21 +8,24 @@ $sText = "";
 $noValue=true;
 if ($oEngine->User_IsAuthorization()) {
 	$action = getRequest('action',null,'post');
+	/*Запрос на создание новой группы*/
 	if ($action=="newgroup") {
 		$groupIdx=getRequest('groupIdx',null,'post');
 		$oEngine->Viewer_Assign('groupIdx',$groupIdx);
 		$sText = $oEngine->Viewer_Fetch(Plugin::GetTemplatePath('treeblogs') . 'actions/ActionTopic/empty_group.tpl');
 		$noValue=false;
 	}
+	/*Запрос на получение элементов уровня или потомков*/
 	if ($action=="level" || $action=="children" ) {
 		$sBlogId=getRequest('blogid',null,'post');
-		
+
 		$nextlevel=getRequest('nextlevel',null,'post');
 		$groupid=getRequest('groupid',null,'post');
-		
+
 		$oEngine->Viewer_Assign('groupid', $groupid );
 		$oEngine->Viewer_Assign('nextlevel', $nextlevel );
-				
+
+		/*возвращаем соседние элементы для BlogId*/
 		if ($action=="level")
 		{
 			if ($sBlogId==-1){ /*запрос на возврат корня дерева*/
@@ -30,12 +33,12 @@ if ($oEngine->User_IsAuthorization()) {
 			} else { /*Запрос на возврат уровня дерева*/
 				$aBlogs  = $oEngine->Blog_GetBlogsTreeLevel ($sBlogId);
 			}
-	
-	 		if (count($aBlogs)>0)
+
+			if (count($aBlogs)>0)
 			{
 				$aoBlogs = $oEngine->Blog_GetBlogsAdditionalData ($aBlogs);
 				$parentId = $aoBlogs[$aBlogs[0]]->getParentId();
-				
+
 				$oEngine->Viewer_VarAssign();
 				$oEngine->Viewer_Assign('BlogId',$sBlogId);
 				$oEngine->Viewer_Assign('aBlogs',$aoBlogs);
@@ -43,7 +46,8 @@ if ($oEngine->User_IsAuthorization()) {
 				$sText = $oEngine->Viewer_Fetch(Plugin::GetTemplatePath('treeblogs') . 'actions/ActionTopic/select_blogs.tpl');
 				$noValue=false;
 			}
-		}	
+		}
+		/*возвращаем дочерние элементы для BlogId*/
 		if ($action=="children")
 		{
 			$sBlogId=getRequest('blogid',null,'post');
@@ -52,7 +56,7 @@ if ($oEngine->User_IsAuthorization()) {
 			{
 				$aoBlogs = $oEngine->Blog_GetBlogsAdditionalData ($aBlogs);
 				$parentId = $aoBlogs[ $aBlogs[0] ]->getParentId();
-			
+					
 				$oEngine->Viewer_VarAssign();
 				$oEngine->Viewer_Assign('BlogId',$sBlogId);
 				$oEngine->Viewer_Assign('aBlogs',$aoBlogs);

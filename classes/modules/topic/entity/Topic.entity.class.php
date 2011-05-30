@@ -2,11 +2,14 @@
 
 class PluginTreeblogs_ModuleTopic_EntityTopic extends PluginTreeblogs_Inherit_ModuleTopic_EntityTopic
 {
-	private $aBlogs;
 	/**
-	 * Строим массив блогов для топика
-	 * @param int blogid
-	 * @return array[blogid]
+	 * 
+	 * */
+	private $aBlogs;
+	
+	/**
+	 * Строим множество всех блогов, которым прямо или косвенно принадлежит топик
+	 * @return aBlogId|int
 	 * */
 	public function GetBlogs(){
 		if (!isset($this->aBlogs)){
@@ -14,45 +17,30 @@ class PluginTreeblogs_ModuleTopic_EntityTopic extends PluginTreeblogs_Inherit_Mo
 			$aSubBlogs	  = $this->Topic_GetTopicSubBlogs($this->getId());
 			foreach($aSubBlogs as $subblogid){
 				$subBlog = $this->Blog_BuildTreeBlogsFromTail($subblogid);
-				$this->aBlogs = array_merge($this->aBlogs, $subBlog); 
+				$this->aBlogs = array_merge($this->aBlogs, $subBlog);
 			}
 		}
 		return $this->aBlogs;
 	}
-	
-    /**
-     * Переопределяем url для мультиблога
-     * @param int $blogId
-     * @return array
-     */
-	/*
-    public function getUrl() {
-    	if (Router::GetAction()=="blog"){
-	        if ($this->getBlog()->getType()!='personal') {
-	        	//$blogUrl = Router::GetActionEvent();
-	        	//$oBlog = $this->Blog_GetBlogByUrl($blogUrl);
-	        	if ( in_array($this->getBlog()->getId(), $this->GetBlogs()) ){
-	        		return Router::GetPath('blog').(Router::GetActionEvent()).'/'.$this->getId().'.html';
-				} else {
-	    			return parent::getUrl();
-				} 
-	        }
-    	}
-		return parent::getUrl();
-    }*/
-    
-    public function getBlog(){
-    	if (Router::GetAction()=="blog"){
+
+	/**
+	 * Возвращаем текущий блог взятый из url, в случая вхождение его в дерево блогов топика. 
+	 * В случає отсутствии "родства" топика и блога - возвращаем дефолтный блог топика
+	 *    
+	 * @return oBlog
+	 */
+	public function getBlog(){
+		if (Router::GetAction()=="blog"){
 			$blogUrl = Router::GetActionEvent();
 			$oBlog = $this->Blog_GetBlogByUrl($blogUrl);
 			if (!empty($oBlog)) {
 				if ( in_array($oBlog->getId(), $this->GetBlogs()) ){
 					return $oBlog;
-				} 
-    		}
-    		
+				}
+			}
+
 		}
 		return parent::getBlog();
-    }
+	}
 
 }

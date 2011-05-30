@@ -1,13 +1,14 @@
+var treepluginsurl='/plugins/treeblogs/include/ajax/treeblogs.php';
 var nxtGroup=0;
-var treepluginsurl='/plugins/ls-plugin-treeblogs/include/ajax/treeblogs.php';
 
+/*Удаление группы*/
 function delGroup(groupidx){
 	var group 	= 'g'+groupidx;
     $(group).destroy();
 }
 
 
-
+/*Добавление новой группы*/
 function addGroup(){
 	var nextGroup 	= parseInt(nxtGroup)+1; 
 	var newGroup 	= 'g'+nxtGroup;
@@ -28,7 +29,7 @@ function addGroup(){
    	},true);
 }
 
-
+/*удаление элемента select*/
 function removeSelects(group, fromlevel){
 	var i = fromlevel;
 	while(true){
@@ -39,7 +40,7 @@ function removeSelects(group, fromlevel){
 		i++;
 	}
 }
-
+/*Обработчик события change для єлементов select*/
 function changeBlogSelector(e){
 	var blogid		= this.getElement(':selected').get('value');
 	var prevLevel	= parseInt(this.name)-1;
@@ -52,7 +53,7 @@ function changeBlogSelector(e){
 	doBlogsRequest('children', blogid, group, nextLevel);
 	
     if (blogid==-1){
-        if (prevLevel==-1) { /*first element in second group*/
+        if (prevLevel==-1) { /* first element in second group */
         	setBlogId(group, -1);
         } else {
         	setBlogId(group, $(group).getElement('#'+group+"_"+prevLevel).get('value'));
@@ -63,6 +64,7 @@ function changeBlogSelector(e){
 	
 }
 
+/*заполняем select значениями*/
 function populateSelector(select, group, nextLevel){
  	var sel = $(group).getElement('#'+group+"_"+nextLevel);
 	if (sel){
@@ -79,8 +81,7 @@ function populateSelector(select, group, nextLevel){
 	}
 }
 
-
-
+/*запрос к системе - выбрать значение для select */
 function doBlogsRequest(action, blogid, group, nextLevel){
    	JsHttpRequest.query(
    	'POST '+DIR_WEB_ROOT+treepluginsurl,
@@ -89,17 +90,19 @@ function doBlogsRequest(action, blogid, group, nextLevel){
    	   	if (!result.noValue){
    	   		populateSelector(result.select, group, nextLevel);
    	   	} else {
-   	   		//removeSelects(group, nextLevel);	
+   	   		// removeSelects(group, nextLevel);
    	   	}
    	},
    	true);
 }
 
+/*функцайка для получения индекса группы из id группы*/
 function getGropuIdx(group){
 	var reg=/\d+/ 
 	return parseInt(reg.exec(group));
 }
 
+/*устанавливаем значение blog_id и subblog_id*/
 function setBlogId(group, blogid){
 	var groupIdx=parseInt(getGropuIdx(group));
 	if (groupIdx == 0){
