@@ -49,7 +49,7 @@ class PluginTreeblogs_HookTopic extends Hook
 				$selected = array();
 				$j=0;
 				foreach ($aBlogsId as $blogid){
-					$blogs			= $this->Blog_GetBlogsTreeLevel($blogid);
+					$blogs	= $this->Blog_GetBlogsTreeLevel($blogid);
 					$allBlogs[$j]	= $this->Blog_GetBlogsAdditionalData($blogs);
 					$j++;
 				}
