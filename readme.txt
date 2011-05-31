@@ -24,19 +24,13 @@
 	{/foreach}     					
 	</select></p>
      				
-В topic_list.tpl, topic.tpl 
-Добавить после <ul class="action">					
-	{hook run='get_topics_blogs' oTopic=$oTopic}
-	{foreach from=$aBlogsTree item=oTree name=tree}
-	<ul class="treeblogs">
-	{foreach from=$oTree item=oBlog name=blogs}
-	<li>
-	<a href="{$oBlog->getUrlFull()}">{$oBlog->getTitle()|escape:'html'}</a>{if !$smarty.foreach.blogs.last}→{/if}
-	</li>
-	{/foreach}
-	</ul>
-	{/foreach}
-	
+В topic_list.tpl, topic.tpl
 Удалить	
 <li><a href="{$oBlog->getUrlFull()}">{$oBlog->getTitle()|escape:'html'}</a>&nbsp;&nbsp;</li>
+ 
+Добавить внутри <ul class="action">
+<!-- PluginTreeblogs-->
+	{hook run='get_topics_blogs' oTopic=$oTopic}
+<!-- /PluginTreeblogs-->
+	
   	   			

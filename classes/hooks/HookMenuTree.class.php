@@ -24,6 +24,9 @@ class PluginTreeblogs_HookMenuTree extends Hook
 	 */
 	public function TreeMenuShow($aData)
 	{
+		if (Config::Get('plugin.treeblogs.treemenu_block_priority')==0){
+			return;
+		}
 		if (isset($aData['oBlog'])  ){
 			$currblog_id = $aData['oBlog']->getId();
 		} elseif (isset($aData['oTopic'])){

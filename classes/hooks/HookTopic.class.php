@@ -108,6 +108,7 @@ class PluginTreeblogs_HookTopic extends Hook
 		$oTopic = $aData['oTopic'];
 		$oBlogsTopic = $this->Blog_GetTopicFullTree($oTopic);
 		$this->Viewer_Assign('aBlogsTree', $oBlogsTopic);
+		return $this->Viewer_Fetch(Plugin::GetTemplatePath('treeblogs') . 'actions/ActionTopic/crumbs.tpl');
 	}
 
 	 

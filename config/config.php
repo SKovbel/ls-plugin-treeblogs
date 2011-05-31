@@ -3,9 +3,9 @@ $config = array();
 $config['blogs']['count'] = 5;
 
 /**
- * Приоритет блока "дерево каталогов"
+ * Приоритет блока "дерево каталогов". 0-disabled
  */
-$config['treemenu_block_priority'] = 175;
+$config['treemenu_block_priority'] = 110;
 
 /**
  * Регистрация таблицы topic_blog

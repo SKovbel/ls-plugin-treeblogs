@@ -24,7 +24,7 @@ class PluginTreeblogs_ModuleTopic_EntityTopic extends PluginTreeblogs_Inherit_Mo
 	}
 
 	/**
-	 * Возвращаем текущий блог взятый из url, в случая вхождение его в дерево блогов топика. 
+	 * Возвращаем текущий блог (взятый из url) если он входит в дерево блогов топика. 
 	 * В случає отсутствии "родства" топика и блога - возвращаем дефолтный блог топика
 	 *    
 	 * @return oBlog
@@ -38,7 +38,6 @@ class PluginTreeblogs_ModuleTopic_EntityTopic extends PluginTreeblogs_Inherit_Mo
 					return $oBlog;
 				}
 			}
-
 		}
 		return parent::getBlog();
 	}
