@@ -5,7 +5,7 @@
  */
 class PluginTreeblogs_HookTopic extends Hook
 {
-
+	
 	/**
 	 * Регистрируем нужные хуки
 	 *
@@ -22,7 +22,6 @@ class PluginTreeblogs_HookTopic extends Hook
 
 		$this->AddHook('topic_add_after', 'TopicEditAf', __CLASS__);
 		$this->AddHook('topic_edit_after', 'TopicEditAf', __CLASS__);
-
 	}
 
 	/**
@@ -97,8 +96,8 @@ class PluginTreeblogs_HookTopic extends Hook
 	}
 
 	/**
-	 * Темплайт хук цепляеться на отображение топика (короткий вид и полный).
-	 * Генерирует навигацию по веткам дерева для каждого блога топика.
+	 * Темплейт хук, цепляеться на отображение топика (короткий вид и полный).
+	 * Генерирует навигацию для топика по веткам его блогов.
 	 *
 	 * @return string
 	 * @param array $data
@@ -123,5 +122,5 @@ class PluginTreeblogs_HookTopic extends Hook
 		$this->Viewer_AppendScript( Plugin::GetTemplatePath(__CLASS__) . 'js/blog-selector.js');
 		$this->Viewer_AppendStyle( Plugin::GetTemplatePath(__CLASS__) . 'css/blog-selector.css');
 	}
-
+	
 }

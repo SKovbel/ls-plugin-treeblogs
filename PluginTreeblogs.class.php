@@ -9,6 +9,15 @@ if (!class_exists('Plugin')) {
 
 class PluginTreeblogs extends Plugin
 {
+	/*Переопределяем шаблоны из базовой комплектации*/ 
+	protected $aDelegates=array(
+   		'template'=>array(
+   			'topic.tpl', 
+   			'topic_list.tpl',
+   			'action/ActionTopic/add.tpl'
+		),       
+	);
+	
     public $aInherits = array(
 //        'action' => array(
 //            'ActionBlog' => '_ActionBlog'),
