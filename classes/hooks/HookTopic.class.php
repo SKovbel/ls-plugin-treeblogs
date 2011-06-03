@@ -76,10 +76,11 @@ class PluginTreeblogs_HookTopic extends Hook
 			{
 				/* Массив массивов. Блоги всех уровней. Для заполнения <select> */
 				$aoLevelBlogs = array();
+				
 				/* Активные блоги в ветке. Для selected="selecеted" */
 				$aiLevelSelectedBlogId = $this->Blog_BuildBranch($iBlogId);
 				
-				/* Формируем блоги для <select> имеющие связи с топиком */
+				/* Формируем уровни блогов для <select> имеющие связи с топиком */
 				foreach ($aiLevelSelectedBlogId as $iBlogId)
 				{
 					array_push(
@@ -92,7 +93,7 @@ class PluginTreeblogs_HookTopic extends Hook
 				
 				/* Ищем дочерние блоги для последнего в цепочке блога. 
 				 * Топик может не иметь с нем никакой связи. 
-				 * Отображаеться как не выбраный <select>
+				 * Отображаеться как невыбраный <select>
 				 */				
 				$tailBlogs = $this->Blog_GetSubBlogs( $iBlogId ); 
 				if (count($tailBlogs) > 0) 

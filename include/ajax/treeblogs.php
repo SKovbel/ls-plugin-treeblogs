@@ -6,17 +6,20 @@ require_once($sDirRoot."/config/config.ajax.php");
 
 $sText = "";
 $noValue=true;
-if ($oEngine->User_IsAuthorization()) {
+if ($oEngine->User_IsAuthorization()) 
+{
 	$action = getRequest('action',null,'post');
 	/*Запрос на создание новой группы*/
-	if ($action=="newgroup") {
+	if ($action=="newgroup") 
+	{
 		$groupIdx=getRequest('groupIdx',null,'post');
 		$oEngine->Viewer_Assign('groupIdx',$groupIdx);
 		$sText = $oEngine->Viewer_Fetch(Plugin::GetTemplatePath('treeblogs') . 'actions/ActionTopic/empty_group.tpl');
 		$noValue=false;
 	}
 	/*Запрос на получение "родніх братьев" или "потомков"*/
-	if ($action=="level" || $action=="children" ) {
+	if ($action=="level" || $action=="children" ) 
+	{
 		$sBlogId=getRequest('blogid',null,'post');
 
 		$nextlevel=getRequest('nextlevel',null,'post');
@@ -28,9 +31,11 @@ if ($oEngine->User_IsAuthorization()) {
 		/*возвращаем соседние элементы для BlogId*/
 		if ($action=="level")
 		{
-			if ($sBlogId==-1){ /*запрос на возврат корня дерева*/
+			if ($sBlogId==-1) 
+			{ /*запрос на возврат корня дерева*/
 				$aBlogs  = $oEngine->Blog_GetMenuBlogs($sBlogId);
-			} else { /*Запрос на возврат уровня дерева*/
+			} else 
+			{ /*Запрос на возврат уровня дерева*/
 				$aBlogs  = $oEngine->Blog_GetSibling ($sBlogId);
 			}
 

@@ -124,7 +124,8 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 				/**
 				 * Позиция вида 'type'
 				 */
-				if(is_string($aBlogId) && is_int($sType)) {
+				if(is_string($aBlogId) && is_int($sType)) 
+				{
 					$sType=$aBlogId;
 					$aBlogId=array();
 				}
@@ -152,9 +153,11 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 		$sWhere=$this->buildFilter($aFilter);
 		$sWhere2=$this->buildFilterSec($aFilter);
 
-		if(isset($aFilter['order']) and !is_array($aFilter['order'])) {
+		if(isset($aFilter['order']) and !is_array($aFilter['order'])) 
+		{
 			$aFilter['order'] = array($aFilter['order']);
-		} else {
+		} else 
+		{
 			$aFilter['order'] = array('topic_date_add desc');
 		}
 		$sql = "
@@ -183,8 +186,10 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 					ORDER BY ".implode(', ', $aFilter['order']) ."
 					LIMIT ?d, ?d";		
 		$aTopics=array();
-		if ($aRows=$this->oDb->selectPage($iCount,$sql,($iCurrPage-1)*$iPerPage, $iPerPage)) {
-			foreach ($aRows as $aTopic) {
+		if ($aRows=$this->oDb->selectPage($iCount,$sql,($iCurrPage-1)*$iPerPage, $iPerPage)) 
+		{
+			foreach ($aRows as $aTopic) 
+			{
 				$aTopics[]=$aTopic['topic_id'];
 			}
 		}

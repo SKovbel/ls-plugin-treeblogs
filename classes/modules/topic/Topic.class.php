@@ -16,7 +16,7 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 	)
 	{
 		return parent::GetTopicsByFilter($this->_getModifiedFilterSubBlogs($aFilter),
-		$iPage, $iPerPage, $aAllowData
+			$iPage, $iPerPage, $aAllowData
 		);
 	}
 
@@ -41,13 +41,17 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 	{
 		$subBlogsFilter = getRequest('b');
 		$subBlogs = array();
-		if ($subBlogsFilter) {
-			if ($aSubBlogsUrl = explode(' ', $subBlogsFilter)) {
+		if ($subBlogsFilter) 
+		{
+			if ($aSubBlogsUrl = explode(' ', $subBlogsFilter)) 
+			{
 				foreach ($aSubBlogsUrl as $subBlogUrl) {
-					if ($oBlog = $this->Blog_GetBlogByUrl($subBlogUrl)) {
+					if ($oBlog = $this->Blog_GetBlogByUrl($subBlogUrl)) 
+					{
 						array_push($subBlogs, $oBlog->getId());
 						$subBlogsMore = $this->_getSubBlogs($oBlog->getId());
-						foreach ($subBlogsMore as $blogMore) {
+						foreach ($subBlogsMore as $blogMore) 
+						{
 							array_push($subBlogs, $blogMore);
 						}
 					}
@@ -55,19 +59,21 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 				$aFilter['blog_id'] = $subBlogs;
 			}
 		} elseif (isset($aFilter['blog_id'])) {
-			if(!is_array($aFilter['blog_id'])) {
+			if(!is_array($aFilter['blog_id'])){
 				$aFilter['blog_id']=array($aFilter['blog_id']);
 			}
 			$aBlogsId = $aFilter['blog_id'];
-			foreach ($aFilter['blog_id'] as $blogId) {
+			foreach ($aFilter['blog_id'] as $blogId){
 				$subBlogs = $this->_getSubBlogs($blogId);
 				$aBlogsId = array_merge($aBlogsId, $subBlogs);
 			}
 			$aFilter['blog_id'] = $aBlogsId;
 		}
 
-		if (isset($aFilter['blog_type'])){
-			if (in_array('company', $aFilter['blog_type'])){
+		if (isset($aFilter['blog_type']))
+		{
+			if (in_array('company', $aFilter['blog_type']))
+			{
 				$aFilter['blog_type'][] = 'open';
 			}
 		}
@@ -85,7 +91,8 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 	{
 		$blogIds = array();
 		$blogIds = $this->Blog_GetSubBlogs($BlogId);
-		foreach ($blogIds as $BlogId) {
+		foreach ($blogIds as $BlogId) 
+		{
 			$subBlogIds = $this->_getSubBlogs($BlogId);
 			$blogIds = array_merge($blogIds, $subBlogIds);
 		}
@@ -99,13 +106,18 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 	 * @param array, array
 	 * @return array
 	 */
-	private function calcInFamilyQuality ($to, $from){
+	private function calcInFamilyQuality ($to, $from)
+	{
 		$i=count($from)-1;
-		foreach($from as $node) {
-			if ( !isset($to[$node]) ){
+		foreach($from as $node) 
+		{
+			if ( !isset($to[$node]) )
+			{
 				$to[$node]=$i;
-			} else {
-				if ($to[$node]==0 and $i > 0 ){
+			} else 
+			{
+				if ($to[$node]==0 and $i > 0 )
+				{
 					$to[$node]=$i;
 				}
 			}

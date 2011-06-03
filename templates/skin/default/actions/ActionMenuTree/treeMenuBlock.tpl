@@ -1,4 +1,3 @@
-{debug}
 <div class="block stream">
     <div class="tl"><div class="tr"></div></div>
     <div class="cl"><div class="cr">

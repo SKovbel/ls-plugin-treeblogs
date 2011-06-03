@@ -1,4 +1,3 @@
-{debug}
 <div id="groups">
 {foreach from=$aGroup item=group  name=grps}
 	{assign var="idxi" value=$smarty.foreach.grps.index}

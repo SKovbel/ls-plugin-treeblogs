@@ -10,7 +10,7 @@
                 <lang name="ukrainian">Веб-студія stfalcon.com</lang>
         </author>
         <homepage>http://stfalcon.com/</homepage>
-        <version>0.0.8</version>
+        <version>0.0.9</version>
         <requires>
                 <livestreet>0.4.2</livestreet>
                 <plugins>
