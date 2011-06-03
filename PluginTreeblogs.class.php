@@ -14,7 +14,9 @@ class PluginTreeblogs extends Plugin
    		'template'=>array(
    			'topic.tpl', 
    			'topic_list.tpl',
-   			'action/ActionTopic/add.tpl'
+   			'actions/ActionTopic/add.tpl',
+   			'actions/ActionMenuTree/treeMenuBlock.tpl',
+   			'actions/ActionMenuTree/treeMenuLevel.tpl',
 		),       
 	);
 	

@@ -6,13 +6,13 @@
 class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 {
 	/**
-	 * Возвращаем блоги принадлежащие одному родителю.
-	 * Выбираем уровень, которому пренадлежит блог
+	 * Возвращаем блоги "родные братья" по дереву.
+	 * BlogId - id одного из братьев
 	 *
 	 * @param int BlogId
 	 * @return aBlogId|int
 	 **/
-	public function GetBlogsTreeLevel ($BlogId)
+	public function GetSibling ($BlogId)
 	{
 		$oBlog = $this->Blog_GetBlogsAdditionalData($BlogId);
 		if (count($oBlog)==0) {
@@ -28,12 +28,12 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 	}
 
 	/**
-	 * Строим ветку дерева для конкретного блога
+	 * Строим ветку для блога
 	 * 
 	 * @param int BlogId
 	 * @return array aBlogId
 	 * */
-	public function BuildTreeBlogsFromTail($BlogId)
+	public function BuildBranch($BlogId)
 	{
 		if (false === ($res = $this->Cache_Get("blogs_tree_"+$BlogId))) {
 			$res = array();
@@ -53,57 +53,55 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 	}
 
 	/**
-	 * Строим поддерево из всех доступных веток для конктретного топика
+	 * Строим все доступные ветки для топика
 	 * @param oTopic
 	 * @return int aBlogId
 	 * */
-	public function GetTopicFullTree($oTopic){
-		$aBlogsTopic = $this->Blog_BuildTreeBlogsFromTail($oTopic->getBlogId());
+	public function GetTopicBranches($oTopic){
+		$aBlogsTopic = $this->Blog_BuildBranch($oTopic->getBlogId());
 
 		$oBlogsTree=array();
 		array_push($oBlogsTree, $this->Blog_GetBlogsAdditionalData($aBlogsTopic));
 		$aSubBlogs	 = $this->Topic_GetTopicSubBlogs($oTopic->getId());
 
 		foreach($aSubBlogs as $subblogid){
-			$subBlog = $this->Blog_BuildTreeBlogsFromTail($subblogid);
+			$subBlog = $this->Blog_BuildBranch($subblogid);
 			array_push($oBlogsTree, $this->Blog_GetBlogsAdditionalData($subBlog));
 		}
 		return 	$oBlogsTree;
 	}
 
 	/**
-	 * Строим полное дерево из всех доступных блогов (древовидное меню) 
+	 * Строим дерево. 
+	 * При $iParentId = null строим полное дерево. 
 	 * Функция рекурсивна
 	 * 
 	 * @param int ParentId
-	 * @return int BlogId
+	 * @return array 
 	 * */
-	public function buidlFullTree($ParentId){
-		if (!$ParentId){
-			if (false === ($res = $this->Cache_Get("blogs_full_tree"))) {
-				$res = array();
+	public function buidlTree($iParentId = null){
+		$aTree = array();
+		if ($iParentId == null){
+			/* Стартовая позиция, нулевой уровень, родителей нет. Пытаемся найти дерево в кеше */ 
+			if (false === ($aTree = $this->Cache_Get("blogs_full_tree"))) {
 				$aBlogsId = $this->oMapperBlog->GetMenuBlogs();
 				$aoBlogs = $this->Blog_GetBlogsAdditionalData($aBlogsId);
-				foreach ($aoBlogs as $Blog){
-					$res[$Blog->getId()]['url']		= $Blog->getUrlFull();
-					$res[$Blog->getId()]['id']		= $Blog->getId();
-					$res[$Blog->getId()]['title']	= $Blog->getTitle();
-					$res[$Blog->getId()]['child']	= $this->buidlFullTree($Blog->getId());
+				foreach ($aoBlogs as $oBlog){
+					$aTree[$oBlog->getId()]['blog'] = $oBlog;
+					$aTree[$oBlog->getId()]['child'] = $this->buidlTree($oBlog->getId());
 				}
-				$this->Cache_Set($res, "blogs_full_tree", array(), 60 * 60 * 3);
+				$this->Cache_Set($aTree, "blogs_full_tree", array(), 60 * 60 * 3);
 			}
-			return $res;
+			return $aTree;
 		} else {
-			$res = array();
-			$aBlogsId = $this->oMapperBlog->GetSubBlogs($ParentId);
+			/* Уровни имеющие родителя, уровень >= 1 */ 
+			$aBlogsId = $this->oMapperBlog->GetSubBlogs($iParentId);
 			$aoBlogs = $this->Blog_GetBlogsAdditionalData($aBlogsId);
-			foreach ($aoBlogs as $Blog){
-				$res[$Blog->getId()]['url']		= $Blog->getUrlFull();
-				$res[$Blog->getId()]['id']		= $Blog->getId();
-				$res[$Blog->getId()]['title']	= $Blog->getTitle();
-				$res[$Blog->getId()]['child']	= $this->buidlFullTree($Blog->getId());
+			foreach ($aoBlogs as $oBlog){
+				$aTree[$oBlog->getId()]['blog'] = $oBlog;
+				$aTree[$oBlog->getId()]['child'] = $this->buidlTree($oBlog->getId());
 			}
-			return $res;
+			return $aTree;
 		}
 	}
 	
@@ -116,12 +114,13 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 	public function UpdateParentId($oBlog)
 	{
 		$this->Cache_Delete('blogs_parent_relations');
+		/* чистим кеш полного дерева */
 		$this->Cache_Delete('blogs_full_tree');
 		$aBlogsId = $this->oMapperBlog->GetMenuBlogs();
 		foreach ($aBlogsId as $blogId) {
+			/* чистим кеш веток блогов */
 			$this->Cache_Delete('blogs_tree_'.$blogId);
 		}
-
 		return $this->oMapperBlog->UpdateParentId($oBlog);
 	}
 

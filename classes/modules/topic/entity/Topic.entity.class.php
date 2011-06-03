@@ -8,15 +8,17 @@ class PluginTreeblogs_ModuleTopic_EntityTopic extends PluginTreeblogs_Inherit_Mo
 	private $aBlogs;
 	
 	/**
-	 * Строим множество всех блогов, которым прямо или косвенно принадлежит топик
+	 * Возвращаем блоги для топика
+	 * как непосредственно связанные так и имеющие родство
+	 * 
 	 * @return array aBlogId
 	 * */
 	public function GetBlogs(){
 		if (!isset($this->aBlogs)){
-			$this->aBlogs = $this->Blog_BuildTreeBlogsFromTail($this->getBlogId());
+			$this->aBlogs = $this->Blog_BuildBranch($this->getBlogId());
 			$aSubBlogs	  = $this->Topic_GetTopicSubBlogs($this->getId());
 			foreach($aSubBlogs as $subblogid){
-				$subBlog = $this->Blog_BuildTreeBlogsFromTail($subblogid);
+				$subBlog = $this->Blog_BuildBranch($subblogid);
 				$this->aBlogs = array_merge($this->aBlogs, $subBlog);
 			}
 		}
@@ -24,8 +26,10 @@ class PluginTreeblogs_ModuleTopic_EntityTopic extends PluginTreeblogs_Inherit_Mo
 	}
 
 	/**
-	 * Возвращаем текущий блог (взятый из url) если он входит в дерево блогов топика. 
-	 * В случає отсутствии "родства" топика и блога - возвращаем дефолтный блог топика
+	 * Возвращаем текущий блог, ощущая влияния url.
+	 * Если url содержит идентификатор блога’’ 
+	 *   и он имеет родство с топиком - вернёться блог’’. 
+	 *   в случає отсутствии родства - возвращаем дефолтный блог топика
 	 *    
 	 * @return oBlog
 	 */

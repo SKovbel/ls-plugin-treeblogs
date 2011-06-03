@@ -6,7 +6,7 @@
 class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_ModuleTopic_MapperTopic
 {
 	/**
-	 * Возвращаем блоги для топика
+	 * Блоги топика, кроме дефолтного
 	 *
 	 * @param  int TopicId
 	 * @return array aBlogId
@@ -76,12 +76,12 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 
 
 	/**
-	 * Доп условие для выборки блога по топику 
+	 * Доп условие для выборки блогов топика, кроме дефолтного 
 	 *
 	 * @param  aFilter
 	 * @return Where | string
 	 */	
-	protected function buildFilter2($aFilter) {
+	protected function buildFilterSec($aFilter) {
 			
 		$sWhere='';
 		if (isset($aFilter['topic_publish'])) {
@@ -150,7 +150,7 @@ class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_Mo
 	 */	
 	public function GetTopics($aFilter,&$iCount,$iCurrPage,$iPerPage) {
 		$sWhere=$this->buildFilter($aFilter);
-		$sWhere2=$this->buildFilter2($aFilter);
+		$sWhere2=$this->buildFilterSec($aFilter);
 
 		if(isset($aFilter['order']) and !is_array($aFilter['order'])) {
 			$aFilter['order'] = array($aFilter['order']);

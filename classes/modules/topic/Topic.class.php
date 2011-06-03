@@ -93,11 +93,13 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 	}
 
 	/**
-	 * Мержим два деревья - удаления дублирующихся промежуточные блоги
-	 * @param int $blogId
+	 * Вспомогательная функция для MergeTopicBlogs
+	 * Мержим два дерева - вычесляем положение в семье - "лист" или "дядь, дедушек, родителей,..."
+	 *
+	 * @param array, array
 	 * @return array
 	 */
-	private function mergeTree($to, $from){
+	private function calcInFamilyQuality ($to, $from){
 		$i=count($from)-1;
 		foreach($from as $node) {
 			if ( !isset($to[$node]) ){
@@ -113,49 +115,74 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 	}
 
 	/**
-	 * Мержим  блоги (Добавление-удаление) для топика
-	 * - Исключаем повторные вхождения блогов для топика
-	 * 
+	 * Мержим топиковые блоги, Добавление-удаление в базе данных.
+	 * Исключаем блоги являющиеся одновременно и листами 
+	 * и "дядями, дедушками, родителями, прадедушками, ....". 
+	 * Только листы!!!
+	 * $BlogId - дефолтный блог 
+	 * POST[subblog_id] - список второстепенных блогов. Функция работает в режиме post запроса 
+	 * 	  
 	 * @param int $TopicId
 	 * @param int $BlogId
 	 * @return array
 	 */
 	public function MergeTopicBlogs($TopicId, $BlogId)
 	{
-		 
+		/*Блоги из запроса*/ 
 		$blogs_post = getRequest('subblog_id');
+		/*Блоги из базы*/ 
 		$blogs_db   = $this->oMapperTopic->GetTopicSubBlogs($TopicId);
 
-		$aResTree = array();
-		$aTreeDefBlog = $this->Blog_BuildTreeBlogsFromTail($BlogId);
+		/*Массив несущий положение в семье. 0 - только лист, 1 и родитель и возможно лист*/
+		$aFamilQuality = array();
+
+		/*Дефолтная ветка, исключаем сразу все блоги из это ветки*/
+		$aTreeDefBlog = $this->Blog_BuildBranch($BlogId);
 		foreach ($aTreeDefBlog as $blog_id)
 		{
-			$aResTree[$blog_id] = 1;
+			$aFamilQuality[$blog_id] = 1;
 		}
 
+		/*Второстепенные ветки из пост запроса*/
 		foreach ($blogs_post as $blog_id)
 		{
 			if ($blog_id > 0) {
-				$aTreeBlog = $this->Blog_BuildTreeBlogsFromTail($blog_id);
-				$aResTree = $this->mergeTree($aResTree, $aTreeBlog);
+				/* вычесляем верхних родственников*/
+				$aFamilQuality = $this->calcInFamilyQuality(
+					$aFamilQuality, 
+					$this->Blog_BuildBranch($blog_id)
+				);
 			}
 		}
-		$aResPosTree = array();
-		foreach ($aResTree as $blog_id => $cnt) {
-			if ($cnt == 0) {
-				array_push($aResPosTree, $blog_id);
+		
+		/*листы*/
+		$aLeaf = array();
+		
+		/*исключаем всех кроме листов*/
+		foreach ($aFamilQuality as $blog_id => $cnt) 
+		{
+			/* если 0 - лист, >0 верхний родственник */
+			if ($cnt == 0) 
+			{
+				array_push($aLeaf, $blog_id);
 			}
 		}
 
+		/* Удаляем из базы данных если
+		 * 1. блог выключили на форме
+		 * 2. блог стал родителем (потерял статус исключительно листа)
+		 */
 		foreach ($blogs_db as $blog)
 		{
-			if (!in_array($blog, $aResPosTree))
+			if (!in_array($blog, $aLeaf))
 			{
 				$this->oMapperTopic->DeleteTopicFromSubBlog($blog['blog_id'], $TopicId);
 			}
 		}
-
-		foreach ($aResPosTree as $blog_id)
+		/* Вставляем в базу данныхЖ
+		 * 1. Блог-Лист отсутствует в базе данных 
+		 * */
+		foreach ($aLeaf as $blog_id)
 		{
 			if ( !in_array($blog_id, $blogs_db) )
 			{
@@ -166,7 +193,7 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 
 	
 	/**
-	 * Возвращаем блоги  топика
+	 * Возвращаем второстипенные блоги топика
 	 * 
 	 * @param int $TopicId
 	 * @return array

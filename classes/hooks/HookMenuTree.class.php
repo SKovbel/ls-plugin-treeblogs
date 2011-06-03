@@ -1,5 +1,9 @@
-
 <?php
+
+/**
+ * Класс генерирующий блок "Дерево Категорий"
+ *
+ */
 
 class PluginTreeblogs_HookMenuTree extends Hook
 {
@@ -19,36 +23,51 @@ class PluginTreeblogs_HookMenuTree extends Hook
 	}
 
 	/**
-	 * Выводим блок - "дерево категорий" 
+	 * Выводим блок - "дерево категорий". 
 	 * @param array $aData
+	 *
+	 * @return void
 	 */
 	public function TreeMenuShow($aData)
 	{
-		if (Config::Get('plugin.treeblogs.treemenu_block_priority')==0){
+		/*Плагин выключен?*/
+		if (Config::Get('plugin.treeblogs.treemenu_block_priority')==0)
+		{
 			return;
 		}
-		if (isset($aData['oBlog'])  ){
-			$currblog_id = $aData['oBlog']->getId();
-		} elseif (isset($aData['oTopic'])){
-			$oBlog = $aData['oTopic']->getBlog();
-			$currblog_id = $oBlog->getId();
-		}
+		
+		/*Подключаем css и js*/
+		$this->Viewer_AppendStyle( Plugin::GetTemplatePath(__CLASS__) . 'css/tree-menu-block.css');
+		$this->Viewer_AppendScript( Plugin::GetTemplatePath(__CLASS__) . 'js/tree-menu-block.js');
+		
+		/*Дерево целиком*/
+		$this->Viewer_Assign('aTree',  $this->Blog_buidlTree() );
+		
+		if (isset($aData['oBlog'])  )
+		{
+			/*Просмотр блога, будет отмечена ветка текущего блога*/
+			$iBlogId = $aData['oBlog']->getId();
+		} 
+		elseif (isset($aData['oTopic']))
+		{
+			/*Просмотр топика, будет отмечена ветка блога по умолчанию текущего топика*/
+			$iBlogId = $aData['oTopic']->getBlog()->getId();
+		} 
 
-		if (isset($currblog_id)){
-			$treePath = $this->Blog_BuildTreeBlogsFromTail($currblog_id);
-			$this->Viewer_Assign('aTreePath',  $treePath );
-			$this->Viewer_Assign('currTreePath',  $currblog_id );
+		if (isset($iBlogId))
+		{
+			/*ветка активного блога*/
+			$this->Viewer_Assign('aTreePath',  $this->Blog_BuildBranch($iBlogId) );
+			/*ативный блог*/
+			$this->Viewer_Assign('iTreeBlogId',  $iBlogId );
 		} else {
+			/*Cтраница без активного блога (нпрм главная, персональный блг). Дерево закрыто*/
 			$this->Viewer_Assign('aTreePath',  array() );
-			$this->Viewer_Assign('currTreePath',  -1 );
+			$this->Viewer_Assign('iTreeBlogId',  -1 );
 		}
-			
-		$fulltree = $this->Blog_buidlFullTree(null);
-		$this->Viewer_Assign('aFullTree',  $fulltree );
-			
-		$this->Viewer_Assign('side_bar_level', Plugin::GetTemplatePath('treeblogs') .'actions/ActionMenuTree/side_bar_level.tpl');
+		
 		$this->Viewer_AddBlock('right',
-			Plugin::GetTemplatePath('treeblogs') .'actions/ActionMenuTree/side_bar.tpl',
+			Plugin::GetTemplatePath(__CLASS__) .'actions/ActionMenuTree/treeMenuBlock.tpl',
 			array(),
 			Config::Get('plugin.treeblogs.treemenu_block_priority')
 		);
@@ -56,18 +75,18 @@ class PluginTreeblogs_HookMenuTree extends Hook
 	}
 
 	/**
-	 * 1. Показываем блок "дерево категорий" для index страницы
-	 * 2. Подключаем front.css и blog-menu.js
+	 * Показываем блок "дерево категорий" для index страницы
 	 * @param array $aVars
+	 * 
+	 * @return void
 	 **/
-	public function InitAction($aVars) {
+	public function InitAction($aVars) 
+	{
 		$action = Router::GetActionEvent();
-		if (empty($action)){
+		if (empty($action))
+		{
 			$this->TreeMenuShow(array());
 		}
-		$this->Viewer_AppendStyle( Plugin::GetTemplatePath(__CLASS__) . 'css/front.css');
-		$this->Viewer_AppendScript( Plugin::GetTemplatePath(__CLASS__) . 'js/blog-menu.js');
-
 	}
 }
 

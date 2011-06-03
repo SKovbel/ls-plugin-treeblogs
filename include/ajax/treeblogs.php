@@ -15,7 +15,7 @@ if ($oEngine->User_IsAuthorization()) {
 		$sText = $oEngine->Viewer_Fetch(Plugin::GetTemplatePath('treeblogs') . 'actions/ActionTopic/empty_group.tpl');
 		$noValue=false;
 	}
-	/*Запрос на получение элементов уровня или потомков*/
+	/*Запрос на получение "родніх братьев" или "потомков"*/
 	if ($action=="level" || $action=="children" ) {
 		$sBlogId=getRequest('blogid',null,'post');
 
@@ -31,7 +31,7 @@ if ($oEngine->User_IsAuthorization()) {
 			if ($sBlogId==-1){ /*запрос на возврат корня дерева*/
 				$aBlogs  = $oEngine->Blog_GetMenuBlogs($sBlogId);
 			} else { /*Запрос на возврат уровня дерева*/
-				$aBlogs  = $oEngine->Blog_GetBlogsTreeLevel ($sBlogId);
+				$aBlogs  = $oEngine->Blog_GetSibling ($sBlogId);
 			}
 
 			if (count($aBlogs)>0)
@@ -73,4 +73,3 @@ $GLOBALS['_RESULT'] = array(
 "select"   => $sText,
 );
 
-?>
