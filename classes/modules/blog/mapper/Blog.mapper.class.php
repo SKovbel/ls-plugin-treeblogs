@@ -1,4 +1,15 @@
 <?php
+/* ---------------------------------------------------------------------------
+ * @Plugin Name: Treeblogs
+ * @Plugin Id: Treeblogs
+ * @Plugin URI:
+ * @Description: Дерево блогов
+ * @Author: mackovey@gmail.com
+ * @Author URI: http://stfalcon.com
+ * @LiveStreet Version: 0.4.2
+ * @License: GNU GPL v2, http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * ----------------------------------------------------------------------------
+ */
 
 /**
  * Маппер Blog модуля Blog плагина Treeblogs
@@ -15,12 +26,9 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 	public function getParentBlogId($blog_id)
 	{
 		$sql = "
-		SELECT 
-			b.parent_id
-		FROM 
-			" . Config::Get('db.table.blog') . " as b
-		WHERE
-			b.blog_id = ?
+		SELECT b.parent_id
+		  FROM " . Config::Get('db.table.blog') . " as b
+		 WHERE b.blog_id = ?
 		";
 		$aRows = $this->oDb->select($sql, $blog_id );
 		if (isset($aRows[0])) {
@@ -38,12 +46,9 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 	public function UpdateParentId($oBlog)
 	{
 		$sql = "
-		UPDATE 
-			" . Config::Get('db.table.blog') . "
-		SET 
-			parent_id = ?
-		WHERE 
-			blog_id = ?d
+		UPDATE " . Config::Get('db.table.blog') . "
+		   SET parent_id = ?
+		 WHERE blog_id = ?d
 		";
 		$this->oDb->query($sql, $oBlog->getParentId(), $oBlog->getId());
 		return true;
@@ -57,14 +62,11 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 	public function GetSubBlogs($BlogId)
 	{
 		$sql = "
-		SELECT 
-			b.blog_id
-		FROM 
-			" . Config::Get('db.table.blog') . " as b
-		WHERE 
-			b.parent_id = ?
-		ORDER BY b.blog_rating DESC
-		LIMIT ?d
+		SELECT b.blog_id
+		  FROM " . Config::Get('db.table.blog') . " as b
+		 WHERE b.parent_id = ?
+		 ORDER BY b.blog_rating DESC
+		 LIMIT ?d
 		";
 		$aBlogs = array();
 		if ($aRows = $this->oDb->select($sql, $BlogId, Config::Get('plugin.treeblogs.blogs.count'))) {
@@ -77,22 +79,37 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 
 	/**
 	 * Выбираем блоги для меню
-	 *
+	 * @param int $iUserOwnerId
 	 * @return array
 	 */
-	public function GetMenuBlogs()
+	public function GetMenuBlogs($iUserOwnerId=0)
 	{
-		$sql = "
-		SELECT
-			b.blog_id
-		FROM
-			" . Config::Get('db.table.blog') . " as b
-		WHERE
-			b.blog_type<>'personal'
-			AND b.parent_id IS NULL
-		";
+                $sql ="";
+                $aRows = array();
+                if ($iUserOwnerId==0) {
+                    $sql = "
+                    SELECT b.blog_id
+                      FROM " . Config::Get('db.table.blog') . " as b
+                     WHERE b.parent_id IS NULL
+                       AND b.blog_type <> 'personal'
+                       AND b.blog_type = 'open'
+                    ";
+                    $aRows = $this->oDb->select($sql);
+                } else {
+                    $sql = "
+                    SELECT 2 main, b.blog_id
+                      FROM " . Config::Get('db.table.blog') . " as b
+                     WHERE b.blog_type = 'open' AND b.parent_id IS NULL
+                     UNION ALL
+                    SELECT 1 main, b.blog_id
+                      FROM " . Config::Get('db.table.blog') . " as b
+                     WHERE b.blog_type = 'personal' AND b.user_owner_id = ?d
+                     ORDER BY main ASC
+                    ";
+                    $aRows = $this->oDb->select($sql, $iUserOwnerId);
+                }
 		$aBlogs = array();
-		if ($aRows = $this->oDb->select($sql)) {
+		if ($aRows) {
 			foreach ($aRows as $aBlog) {
 				$aBlogs[] = $aBlog['blog_id'];
 			}
@@ -109,14 +126,11 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 	public function GetBlogsForSelect($blogId = null)
 	{
 		$sql = "
-		SELECT
-			b.blog_id as id, b.blog_title as title, b.parent_id
-		FROM
-			" . Config::Get('db.table.blog') . " as b
-		WHERE
-			b.blog_type<>'personal'
+		SELECT b.blog_id as id, b.blog_title as title, b.parent_id
+		  FROM " . Config::Get('db.table.blog') . " as b
+		 WHERE b.blog_type<>'personal' AND b.blog_type = 'open'
 		";
-		if (!is_null($blogId)) {
+		if ( $blogId>0 ) {
 			$sql .= 'AND b.blog_id <> ' . $blogId;
 		}
 		$sql .= " ORDER BY b.blog_title";
@@ -130,12 +144,9 @@ class PluginTreeblogs_ModuleBlog_MapperBlog extends PluginTreeblogs_Inherit_Modu
 	public function GetBlogRelations()
 	{
 		$sql = "
-		SELECT
-			b.blog_id, b.parent_id
-		FROM
-			" . Config::Get('db.table.blog') . " as b
-		WHERE
-			b.blog_type<>'personal'
+		SELECT b.blog_id, b.parent_id
+		  FROM " . Config::Get('db.table.blog') . " as b
+		 WHERE b.blog_type<>'personal' AND b.blog_type = 'open'
 		";
 		$aBlogs = array();
 		if ($aRows = $this->oDb->select($sql)) {

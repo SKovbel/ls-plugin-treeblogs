@@ -1,4 +1,15 @@
 <?php
+/* ---------------------------------------------------------------------------
+ * @Plugin Name: Treeblogs
+ * @Plugin Id: Treeblogs
+ * @Plugin URI:
+ * @Description: Дерево блогов
+ * @Author: mackovey@gmail.com
+ * @Author URI: http://stfalcon.com
+ * @LiveStreet Version: 0.4.2
+ * @License: GNU GPL v2, http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * ----------------------------------------------------------------------------
+ */
 
 class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 {
@@ -141,9 +152,9 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 	public function MergeTopicBlogs($TopicId, $BlogId)
 	{
 		/*Блоги из запроса*/ 
-		$blogs_post = getRequest('subblog_id');
+		$blogs_post = getRequest('subblog_id') ? getRequest('subblog_id') : array();
 		/*Блоги из базы*/ 
-		$blogs_db   = $this->oMapperTopic->GetTopicSubBlogs($TopicId);
+		$blogs_db   = $this->oMapperTopic->GetTopicBlogs($TopicId);
 
 		/*Массив несущий положение в семье. 0 - только лист, 1 и родитель и возможно лист*/
 		$aFamilQuality = array();
@@ -201,6 +212,7 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 				$this->oMapperTopic->AddTopicToSubBlog($blog_id, $TopicId);
 			}
 		}
+                $this->Cache_Delete("topic_branches_".$TopicId);
 	}
 
 	
@@ -208,14 +220,32 @@ class PluginTreeblogs_ModuleTopic extends PluginTreeblogs_Inherit_ModuleTopic
 	 * Возвращаем второстипенные блоги топика
 	 * 
 	 * @param int $TopicId
+	 * @param string $sOrder edit|show
 	 * @return array
 	 */
-	public function GetTopicSubBlogs($TopicId)
+	public function GetTopicBlogs($TopicId)
 	{
-		return $this->oMapperTopic->GetTopicSubBlogs($TopicId);
+		return $this->oMapperTopic->GetTopicBlogs($TopicId);
 	}
 
+	/**
+	 * Строим все доступные ветки для топика
+	 * @param oTopic
+	 * @return int aBlogId
+	 * */
+	public function GetTopicBranches($oTopic){
+                if (false === ($oBlogsTree = $this->Cache_Get("topic_branches_".$oTopic->getId()))) {
+                    $oBlogsTree=array();
+                    $aSubBlogs	 = $this->Topic_GetTopicBlogs($oTopic->getId());
 
+                    foreach($aSubBlogs as $subblogid){
+                            $subBlog = $this->Blog_BuildBranch($subblogid);
+                            array_push($oBlogsTree, $this->Blog_GetBlogsAdditionalData($subBlog));
+                    }
+                    $this->Cache_Set($oBlogsTree, "topic_branches_".$oTopic->getId(), array('treeblogs.branches'), 60 * 60 * 3);
+                }
+                return 	$oBlogsTree;
+	}
 
 
 }

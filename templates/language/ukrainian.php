@@ -11,15 +11,13 @@
  * ----------------------------------------------------------------------------
  */
 
-
 /**
- * English language file for plugin Treeblogs
+ * Украинский языковой файл для плагина Treeblogs
  */
 return array(
-    'blog_assign' => 'Assign to blog',
-    'no_assign' => 'Not assign',
-    'del_group'	=> 'Delete group',
-    'add_group'	=> 'Add another group',
-    'block_menutree_title' => 'Tree blogs',
-    
+    'blog_assign' => "Прив'язати до блогу",
+    'no_assign' => "Не прив'язувати",
+    'del_group'	=> 'Видалити групу',
+    'add_group'	=> 'Додати іншу групу',
+    'block_menutree_title' => 'Дерево блогів',
 );

@@ -1,4 +1,15 @@
 <?php
+/* ---------------------------------------------------------------------------
+ * @Plugin Name: Treeblogs
+ * @Plugin Id: Treeblogs
+ * @Plugin URI:
+ * @Description: Дерево блогов
+ * @Author: mackovey@gmail.com
+ * @Author URI: http://stfalcon.com
+ * @LiveStreet Version: 0.4.2
+ * @License: GNU GPL v2, http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * ----------------------------------------------------------------------------
+ */
 
 class PluginTreeblogs_ModuleTopic_EntityTopic extends PluginTreeblogs_Inherit_ModuleTopic_EntityTopic
 {
@@ -16,7 +27,7 @@ class PluginTreeblogs_ModuleTopic_EntityTopic extends PluginTreeblogs_Inherit_Mo
 	public function GetBlogs(){
 		if (!isset($this->aBlogs)){
 			$this->aBlogs = $this->Blog_BuildBranch($this->getBlogId());
-			$aSubBlogs	  = $this->Topic_GetTopicSubBlogs($this->getId());
+			$aSubBlogs	  = $this->Topic_GetTopicBlogs($this->getId());
 			foreach($aSubBlogs as $subblogid){
 				$subBlog = $this->Blog_BuildBranch($subblogid);
 				$this->aBlogs = array_merge($this->aBlogs, $subBlog);

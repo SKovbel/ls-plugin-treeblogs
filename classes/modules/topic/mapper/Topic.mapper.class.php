@@ -1,4 +1,15 @@
 <?php
+/* ---------------------------------------------------------------------------
+ * @Plugin Name: Treeblogs
+ * @Plugin Id: Treeblogs
+ * @Plugin URI:
+ * @Description: Дерево блогов
+ * @Author: mackovey@gmail.com
+ * @Author URI: http://stfalcon.com
+ * @LiveStreet Version: 0.4.2
+ * @License: GNU GPL v2, http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * ----------------------------------------------------------------------------
+ */
 
 /**
  * Маппер Topic модуля Topic плагина Treeblogs
@@ -6,25 +17,30 @@
 class PluginTreeblogs_ModuleTopic_MapperTopic extends PluginTreeblogs_Inherit_ModuleTopic_MapperTopic
 {
 	/**
-	 * Блоги топика, кроме дефолтного
+	 * Блоги топика, +дефолтный, сортируем для просмотра персональный сверху, для админки поочерёдно
 	 *
 	 * @param  int TopicId
 	 * @return array aBlogId
 	 */	
-	public function GetTopicSubBlogs($TopicId)
+	public function GetTopicBlogs($TopicId)
 	{
 		$sql = "
-		SELECT
-			a.blog_id
-		FROM
-			" . Config::Get('db.table.topic_blog') . " a
-		WHERE
-			a.topic_id = ?
-		ORDER BY a.blog_id ASC
-		";
-		 
-		$aBlogs = array();
-		if ($aRows = $this->oDb->select($sql, $TopicId)) {
+		SELECT '1' main, a.blog_id, b.blog_type
+		  FROM " . Config::Get('db.table.topic') . " a,
+                       " . Config::Get('db.table.blog') . " b
+		 WHERE a.blog_id = b.blog_id
+		   AND a.topic_id = ?
+                 UNION ALL  
+		SELECT '2' main, a.blog_id, b.blog_type
+		  FROM " . Config::Get('db.table.topic_blog') . " a,
+                       " . Config::Get('db.table.blog') . " b
+		 WHERE a.blog_id = b.blog_id
+		   AND a.topic_id = ?
+                ";
+                $sql .= "ORDER BY main, blog_id";
+
+                $aBlogs = array();
+		if ($aRows = $this->oDb->select($sql, $TopicId, $TopicId)) {
 			foreach ($aRows as $aBlog) {
 				$aBlogs[] = $aBlog['blog_id'];
 			}

@@ -1,4 +1,15 @@
 <?php
+/* ---------------------------------------------------------------------------
+ * @Plugin Name: Treeblogs
+ * @Plugin Id: Treeblogs
+ * @Plugin URI:
+ * @Description: Дерево блогов
+ * @Author: mackovey@gmail.com
+ * @Author URI: http://stfalcon.com
+ * @LiveStreet Version: 0.4.2
+ * @License: GNU GPL v2, http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * ----------------------------------------------------------------------------
+ */
 
 /**
  * Модуль Blog плагина Treeblogs
@@ -22,7 +33,7 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 		if (isset($parentid)) {
 			$aBlogId = $this->oMapperBlog->GetSubBlogs($parentid);
 		} else {
-			$aBlogId = $this->oMapperBlog->GetMenuBlogs();
+			$aBlogId = $this->oMapperBlog->GetMenuBlogs($this->User_GetUserCurrent()->getId());
 		}
 		return $aBlogId;
 	}
@@ -35,7 +46,7 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 	 * */
 	public function BuildBranch($BlogId)
 	{
-		if (false === ($res = $this->Cache_Get("blogs_tree_"+$BlogId))) {
+		if (false === ($res = $this->Cache_Get('blogs_tree_'.$BlogId))) {
 			$res = array();
 			array_unshift($res, $BlogId);
 			$workid = $BlogId;
@@ -47,28 +58,9 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 					array_unshift($res, $workid);
 				}
 			}
-			$this->Cache_Set($res, "blogs_tree_"+$BlogId, array(), 60 * 60 * 3);
+			$this->Cache_Set($res, 'blogs_tree_'.$BlogId, array(), 60 * 60 * 3);
 		}
 		return $res;
-	}
-
-	/**
-	 * Строим все доступные ветки для топика
-	 * @param oTopic
-	 * @return int aBlogId
-	 * */
-	public function GetTopicBranches($oTopic){
-		$aBlogsTopic = $this->Blog_BuildBranch($oTopic->getBlogId());
-
-		$oBlogsTree=array();
-		array_push($oBlogsTree, $this->Blog_GetBlogsAdditionalData($aBlogsTopic));
-		$aSubBlogs	 = $this->Topic_GetTopicSubBlogs($oTopic->getId());
-
-		foreach($aSubBlogs as $subblogid){
-			$subBlog = $this->Blog_BuildBranch($subblogid);
-			array_push($oBlogsTree, $this->Blog_GetBlogsAdditionalData($subBlog));
-		}
-		return 	$oBlogsTree;
 	}
 
 	/**
@@ -84,7 +76,7 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 		if ($iParentId == null){
 			/* Стартовая позиция, нулевой уровень, родителей нет. Пытаемся найти дерево в кеше */ 
 			if (false === ($aTree = $this->Cache_Get("blogs_full_tree"))) {
-				$aBlogsId = $this->oMapperBlog->GetMenuBlogs();
+				$aBlogsId = $this->oMapperBlog->GetMenuBlogs(0);
 				$aoBlogs = $this->Blog_GetBlogsAdditionalData($aBlogsId);
 				foreach ($aoBlogs as $oBlog){
 					$aTree[$oBlog->getId()]['blog'] = $oBlog;
@@ -116,7 +108,9 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 		$this->Cache_Delete('blogs_parent_relations');
 		/* чистим кеш полного дерева */
 		$this->Cache_Delete('blogs_full_tree');
-		$aBlogsId = $this->oMapperBlog->GetMenuBlogs();
+		/* подчищаем все деревья для топиков */
+		$this->Cache_Clean( Zend_Cache::CLEANING_MODE_ALL, array('treeblogs.branches') );
+		$aBlogsId = $this->oMapperBlog->GetMenuBlogs($this->User_GetUserCurrent()->getId());
 		foreach ($aBlogsId as $blogId) {
 			/* чистим кеш веток блогов */
 			$this->Cache_Delete('blogs_tree_'.$blogId);
@@ -132,26 +126,29 @@ class PluginTreeblogs_ModuleBlog extends PluginTreeblogs_Inherit_ModuleBlog
 	 */
 	public function GetSubBlogs($blogId)
 	{
-		return $this->oMapperBlog->GetSubBlogs($blogId);
+            return $this->oMapperBlog->GetSubBlogs($blogId);
 	}
 
 	/**
 	 * Возвращает блоги для меню
 	 *
-	 * @param boolean $bReturnIdOnly
+         * @param boolean $bReturnIdOnly
+         * @param boolean $bShowPersonal
 	 * @return array
 	 */
-	public function GetMenuBlogs($bReturnIdOnly = false)
+	public function GetMenuBlogs($bReturnIdOnly = false, $bShowPersonal=false)
 	{
-		$data = $this->oMapperBlog->GetMenuBlogs();
-		/**
-		 * Возвращаем только иденитификаторы
-		 */
-		if ($bReturnIdOnly)
-		return $data;
-
-		$data = $this->Blog_GetBlogsAdditionalData($data);
-		return $data;
+            $data = array();
+            if ($bShowPersonal) {
+		$data = $this->oMapperBlog->GetMenuBlogs($this->User_GetUserCurrent()->getId());
+            } else {
+		$data = $this->oMapperBlog->GetMenuBlogs(0);
+            }
+            
+            if ($bReturnIdOnly) {/* Возвращаем только иденитификаторы */
+                return $data;
+            }
+            return $this->Blog_GetBlogsAdditionalData($data);
 	}
 
 	/**

@@ -1,4 +1,15 @@
 <?php
+/* ---------------------------------------------------------------------------
+ * @Plugin Name: Treeblogs
+ * @Plugin Id: Treeblogs
+ * @Plugin URI:
+ * @Description: Дерево блогов
+ * @Author: mackovey@gmail.com
+ * @Author URI: http://stfalcon.com
+ * @LiveStreet Version: 0.4.2
+ * @License: GNU GPL v2, http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * ----------------------------------------------------------------------------
+ */
 
 /**
  * Плагин Treeblogs. Хуки для блогов
@@ -13,7 +24,7 @@ class PluginTreeblogs_HookBlog extends Hook
 	 */
 	public function RegisterHook()
 	{
-		$this->AddHook('template_form_add_blog_begin', 'TemplateFormAddBlogBegin', __CLASS__);
+		$this->AddHook('template_form_add_blog_begin', 'TemplateFormAddBlogBegin', __CLASS__, -100);
 		$this->AddHook('template_menu_blog_begin', 'BlogMenu', __CLASS__);
 
 		$this->AddHook('blog_add_after', 'BlogToBlog', __CLASS__);
@@ -24,20 +35,29 @@ class PluginTreeblogs_HookBlog extends Hook
 	}
 
 	/**
-	 * Шаблон с списком блогов. Цепляется на хук в начало формы редактирования блога
+	 * Шаблон с списком блогов. Цепляется на хук в начало формы создания/редактирования блога
 	 *
 	 * @return string
 	 */
 	public function TemplateFormAddBlogBegin()
 	{
-		$blogId = $_REQUEST['blog_id'];
-		$oBlog = $this->Blog_GetBlogById($blogId);
-		$aBlogs = $this->Blog_GetBlogsForSelect($blogId);
-		if ($oBlog) {
-			unset($aBlogs[$blogId]);
+                $blogId = getRequest('blog_id');
+                
+                /* Список блогов для привязки */
+                $aBlogs = $this->Blog_GetBlogsForSelect($blogId);
+                
+		if ( $blogId > 0 ) { /*редактирование блога*/
+			//unset($aBlogs[$blogId]);
+                        /*выставляем parent_id */
+                        $oBlog = $this->Blog_GetBlogById($blogId);
 			$this->Viewer_Assign('parentId', $oBlog->getParentId());
-		}
-		$this->Viewer_Assign('aBlogs', $aBlogs);
+		} else { /*создание блога */
+                        /*выставляем parent_id */
+                        $parentId = getRequest('parent_id');
+			$this->Viewer_Assign('parentId', $parentId);
+                }
+                /**/    
+                $this->Viewer_Assign('aBlogs', $aBlogs);
 		return $this->Viewer_Fetch(Plugin::GetTemplatePath('treeblogs') . 'actions/ActionBlog/form_add_blog_to_blog.tpl');
 	}
 

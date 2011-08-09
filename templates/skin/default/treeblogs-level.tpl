@@ -5,7 +5,7 @@
 			<div class="{if in_array($branch.blog->getId(),$aTreePath)}active{else}regular{/if}" id="d{$branch.blog->getId()}" onclick="reverseMenu('{$branch.blog->getId()}')"></div>
 			<a class="{if $iTreeBlogId == $branch.blog->getId() }active{else}regular{/if}" href="{$branch.blog->getUrlFull()}">{$branch.blog->getTitle()}</a>
 			<ul class="{if in_array($branch.blog->getId(),$aTreePath)}active{else}regular{/if} level{$level}" id="m{$branch.blog->getId()}">
-			{include file='actions/ActionMenuTree/treeMenuLevel.tpl' tree=$branch.child level=$level}
+                            {include file="treeblogs-level.tpl" tree=$branch.child level=$level}
 			</ul>
 		{else}
 			<div class="end"></div>
